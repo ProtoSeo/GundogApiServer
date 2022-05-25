@@ -2,6 +2,7 @@ val ktor_version: String by project
 val kotlin_version: String by project
 val logback_version: String by project
 val exposedVersion: String by project
+val kodeinVersion: String by project
 
 plugins {
     application
@@ -35,6 +36,9 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
+    implementation("mysql:mysql-connector-java:8.0.19")
+    implementation("com.zaxxer:HikariCP:3.4.2")
+    implementation("org.kodein.di:kodein-di:$kodeinVersion")
     testImplementation("io.ktor:ktor-server-tests-jvm:$ktor_version")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
 }
