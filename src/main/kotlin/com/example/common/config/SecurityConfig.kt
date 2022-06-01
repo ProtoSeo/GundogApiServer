@@ -1,7 +1,5 @@
 package com.example.common.config
 
-import com.auth0.jwt.JWT
-import com.auth0.jwt.algorithms.Algorithm
 import com.example.utils.JwtProvider
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
