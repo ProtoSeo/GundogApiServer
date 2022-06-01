@@ -28,6 +28,6 @@ object JwtProvider {
             .withIssuer(issuer)
             .withAudience(audience)
             .withClaim("email", member.email)
-            .withClaim("userId", member.id)
+            .withClaim("id", member.id)
             .withExpiresAt(Date(System.currentTimeMillis() + validityInMs)).sign(Algorithm.HMAC256(secret))
 }
