@@ -1,4 +1,4 @@
-package com.example.member
+package com.example.member.router
 
 import com.example.member.dto.MemberRequest
 import com.example.member.service.MemberService
