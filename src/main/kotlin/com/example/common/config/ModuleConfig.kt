@@ -2,6 +2,8 @@ package com.example.common.config
 
 import com.example.member.repository.MemberRepository
 import com.example.member.service.MemberService
+import com.example.memberitem.repository.MemberItemRepository
+import com.example.memberitem.service.MemberItemService
 import com.example.memberstage.repository.MemberStageRepository
 import com.example.memberstage.service.MemberStageService
 import com.example.stage.repository.StageRepository
@@ -12,7 +14,7 @@ import org.kodein.di.instance
 
 object ModuleConfig {
     private val memberModule = DI.Module("Member") {
-        bindSingleton { MemberService(instance()) }
+        bindSingleton { MemberService(instance(), instance()) }
         bindSingleton { MemberRepository() }
     }
 
@@ -26,9 +28,15 @@ object ModuleConfig {
         bindSingleton { MemberStageRepository() }
     }
 
+    private val memberItemModule = DI.Module("MemberItem") {
+        bindSingleton { MemberItemService(instance()) }
+        bindSingleton { MemberItemRepository() }
+    }
+
     internal val kodein = DI {
         import(memberModule)
         import(stageModule)
         import(memberStageModule)
+        import(memberItemModule)
     }
 }
