@@ -2,6 +2,8 @@ package com.example.common.config
 
 import com.example.member.router.memberRoute
 import com.example.member.service.MemberService
+import com.example.memberitem.router.memberItemRoute
+import com.example.memberitem.service.MemberItemService
 import com.example.memberstage.router.memberStageRoute
 import com.example.memberstage.service.MemberStageService
 import com.example.stage.router.stageRouter
@@ -14,10 +16,12 @@ fun Application.configureRouting() {
     val memberService: MemberService by ModuleConfig.kodein.instance()
     val stageService: StageService by ModuleConfig.kodein.instance()
     val memberStageService: MemberStageService by ModuleConfig.kodein.instance()
+    val memberItemService: MemberItemService by ModuleConfig.kodein.instance()
 
     routing {
         memberRoute(memberService)
         memberStageRoute(memberStageService)
         stageRouter(stageService)
+        memberItemRoute(memberItemService)
     }
 }
