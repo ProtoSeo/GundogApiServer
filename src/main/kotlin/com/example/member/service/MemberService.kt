@@ -5,22 +5,28 @@ import com.example.member.dto.MemberRequest
 import com.example.member.exception.MemberException
 import com.example.member.exception.MemberExceptionType
 import com.example.member.repository.MemberRepository
+import com.example.memberitem.repository.MemberItemRepository
 import com.example.utils.JwtProvider
 import java.util.*
 
-class MemberService(private val memberRepository: MemberRepository) {
+class MemberService(
+    private val memberRepository: MemberRepository,
+    private val memberItemRepository: MemberItemRepository
+) {
     private val base64Encoder = Base64.getEncoder()
 
     fun register(request: MemberRequest): Long {
-        if(isDuplicateEmail(request.email)) {
+        if (isDuplicateEmail(request.email)) {
             throw MemberException(MemberExceptionType.DUPLICATE_EMAIL)
         }
-        return memberRepository.save(request.copy(password = String(base64Encoder.encode(request.password.toByteArray()))))
+        val memberId = memberRepository.save(request.copy(password = String(base64Encoder.encode(request.password.toByteArray()))))
+        memberItemRepository.saveMemberItems(memberId)
+        return memberId
     }
 
     fun login(request: MemberRequest): MemberLoginResponse {
         val member = memberRepository.findByEmail(request.email)
-        if(member.password == String(base64Encoder.encode(request.password.toByteArray()))) {
+        if (member.password == String(base64Encoder.encode(request.password.toByteArray()))) {
             return MemberLoginResponse(member.email, JwtProvider.createJWT(member))
         }
         throw MemberException(MemberExceptionType.UN_AUTHORIZATION)
