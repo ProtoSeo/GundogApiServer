@@ -19,7 +19,7 @@ class MemberItemRepository {
     fun saveMemberItems(memberId: Long) {
         transaction {
             val list = Items.selectAll().map { it[Items.id].value }.toList()
-            MemberItems.batchInsert(list) { itemId ->
+            MemberItems.batchInsert(list, shouldReturnGeneratedValues = false) { itemId ->
                 this[MemberItems.itemId] = itemId
                 this[MemberItems.memberId] = memberId
                 this[MemberItems.count] = 0
