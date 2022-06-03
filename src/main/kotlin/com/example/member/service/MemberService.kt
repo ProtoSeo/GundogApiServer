@@ -5,13 +5,15 @@ import com.example.member.dto.MemberRequest
 import com.example.member.exception.MemberException
 import com.example.member.exception.MemberExceptionType
 import com.example.member.repository.MemberRepository
+import com.example.membercharacter.repository.MemberCharacterRepository
 import com.example.memberitem.repository.MemberItemRepository
 import com.example.utils.JwtProvider
 import java.util.*
 
 class MemberService(
     private val memberRepository: MemberRepository,
-    private val memberItemRepository: MemberItemRepository
+    private val memberItemRepository: MemberItemRepository,
+    private val memberCharacterRepository: MemberCharacterRepository
 ) {
     private val base64Encoder = Base64.getEncoder()
 
@@ -21,6 +23,7 @@ class MemberService(
         }
         val memberId = memberRepository.save(request.copy(password = String(base64Encoder.encode(request.password.toByteArray()))))
         memberItemRepository.saveMemberItems(memberId)
+        memberCharacterRepository.saveMemberCharacters(memberId)
         return memberId
     }
 
