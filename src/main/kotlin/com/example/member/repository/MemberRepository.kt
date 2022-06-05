@@ -16,7 +16,7 @@ class MemberRepository {
 
     fun existsMemberByEmail(email: String): Boolean {
         return transaction {
-            Members.select(Members.email eq email).count() > 0L
+            Members.slice(Members.id).select(Members.email eq email).count() > 0
         }
     }
 
@@ -35,11 +35,11 @@ class MemberRepository {
         }
     }
 
-    fun findByEmail(email: String): Member {
+    fun findByEmail(email: String): Member? {
         return transaction {
             Members.select(Members.email eq email)
-                .first()
-                .let { Member(it[Members.id].value, it[Members.password], it[Members.email]) }
+                .map { Member(it[Members.id].value, it[Members.password], it[Members.email]) }
+                .firstOrNull()
         }
     }
 }
