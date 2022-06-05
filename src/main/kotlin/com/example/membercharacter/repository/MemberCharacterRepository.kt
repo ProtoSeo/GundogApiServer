@@ -4,7 +4,7 @@ import com.example.character.domain.Characters
 import com.example.membercharacter.domain.LevelLimit.*
 import com.example.membercharacter.domain.MemberCharacters
 import com.example.membercharacter.dto.MemberCharacterLevelUpRequest
-import com.example.membercharacter.dto.MemberCharacterResponse
+import com.example.membercharacter.dto.MemberCharacter
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 
@@ -18,7 +18,9 @@ class MemberCharacterRepository {
 
     fun saveMemberCharacters(memberId: Long) {
         transaction {
-            val characterIds = Characters.selectAll().orderBy(Characters.id).map { it[Characters.id].value }.toList()
+            val characterIds = Characters.slice(Characters.id).selectAll().orderBy(Characters.id)
+                .map { it[Characters.id].value }
+                .toList()
             var first = true
             MemberCharacters.batchInsert(characterIds, shouldReturnGeneratedValues = false) { characterId ->
                 this[MemberCharacters.memberId] = memberId
@@ -31,28 +33,27 @@ class MemberCharacterRepository {
         }
     }
 
-    fun findById(memberCharacterId: Long): MemberCharacterResponse {
+    fun findById(memberCharacterId: Long): MemberCharacter? {
         return transaction {
             MemberCharacters.select { MemberCharacters.id eq memberCharacterId }
                 .map { row ->
-                    MemberCharacterResponse(
+                    MemberCharacter(
                         row[MemberCharacters.id].value,
                         row[MemberCharacters.characterId].value,
                         row[MemberCharacters.healthLevel],
                         row[MemberCharacters.staminaLevel],
                         row[MemberCharacters.isOpen]
                     )
-                }.first()
+                }.firstOrNull()
         }
     }
 
-    fun findAllByMemberId(memberId: Long): List<MemberCharacterResponse> {
+    fun findAllByMemberId(memberId: Long): List<MemberCharacter> {
         return transaction {
-            (MemberCharacters.innerJoin(Characters))
-                .select { MemberCharacters.memberId eq memberId }
+            MemberCharacters.select { MemberCharacters.memberId eq memberId }
                 .orderBy(MemberCharacters.characterId)
                 .map { row ->
-                    MemberCharacterResponse(
+                    MemberCharacter(
                         row[MemberCharacters.id].value,
                         row[MemberCharacters.characterId].value,
                         row[MemberCharacters.healthLevel],
@@ -63,7 +64,7 @@ class MemberCharacterRepository {
         }
     }
 
-    fun update(memberCharacterId: Long, request: MemberCharacterLevelUpRequest): MemberCharacterResponse {
+    fun update(memberCharacterId: Long, request: MemberCharacterLevelUpRequest): MemberCharacter? {
         transaction {
             MemberCharacters.update({ MemberCharacters.id eq memberCharacterId }) { row ->
                 if (request.healthLevel <= HEALTH_LEVEL.limit) row[healthLevel] = request.healthLevel
@@ -73,7 +74,7 @@ class MemberCharacterRepository {
         return findById(memberCharacterId)
     }
 
-    fun update(memberCharacterId: Long): MemberCharacterResponse {
+    fun update(memberCharacterId: Long): MemberCharacter? {
         transaction {
             MemberCharacters.update({ MemberCharacters.id eq memberCharacterId }) { row ->
                 row[isOpen] = true
