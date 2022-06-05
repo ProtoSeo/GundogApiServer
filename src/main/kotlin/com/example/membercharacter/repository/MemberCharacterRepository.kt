@@ -36,6 +36,7 @@ class MemberCharacterRepository {
     fun findById(memberCharacterId: Long): MemberCharacter? {
         return transaction {
             MemberCharacters.select { MemberCharacters.id eq memberCharacterId }
+                .limit(1)
                 .map { row ->
                     MemberCharacter(
                         row[MemberCharacters.id].value,

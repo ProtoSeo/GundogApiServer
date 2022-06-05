@@ -37,7 +37,7 @@ class MemberRepository {
 
     fun findByEmail(email: String): Member? {
         return transaction {
-            Members.select(Members.email eq email)
+            Members.select(Members.email eq email).limit(1)
                 .map { Member(it[Members.id].value, it[Members.password], it[Members.email]) }
                 .firstOrNull()
         }
