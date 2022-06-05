@@ -33,7 +33,8 @@ class MemberItemRepository {
     fun update(memberId: Long, request: MemberItemRequest) {
         transaction {
             val memberItem = MemberItems.innerJoin(Items).slice(Items.id, Items.limit, MemberItems.count)
-                .select(MemberItems.memberId eq memberId and (MemberItems.itemId eq request.itemId)).firstOrNull()
+                .select(MemberItems.memberId eq memberId and (MemberItems.itemId eq request.itemId)).limit(1)
+                .firstOrNull()
 
             memberItem?.let {
                 MemberItems.update({ MemberItems.memberId eq memberId and (MemberItems.itemId eq request.itemId) }) { row ->

@@ -31,7 +31,7 @@ class MemberStageRepository {
         return transaction {
             val memberStage = MemberStages.select {
                 MemberStages.memberId eq memberId and (MemberStages.stageId eq request.stageId)
-            }.firstOrNull()
+            }.limit(1).firstOrNull()
 
             val isClear = memberStage?.get(MemberStages.isClear) ?: false
             val bestScore = memberStage?.get(MemberStages.bestScore) ?: 0L
@@ -53,6 +53,7 @@ class MemberStageRepository {
             (MemberStages.innerJoin(Members))
                 .slice(MemberStages.id, Members.email, MemberStages.bestScore, MemberStages.isClear)
                 .select { MemberStages.memberId eq memberId and (MemberStages.stageId eq stageId) }
+                .limit(1)
                 .map {
                     MemberStageInfo(
                         it[MemberStages.id].value,
