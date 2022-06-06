@@ -1,11 +1,8 @@
 package com.example.stage.repository
 
 import com.example.stage.domain.Stages
-import com.example.stage.dto.StageResponse
-import com.example.stage.dto.StageSaveRequest
+import com.example.stage.dto.Stage
 import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.SortOrder
-import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 
@@ -16,19 +13,10 @@ class StageRepository {
         }
     }
 
-    fun save(request: StageSaveRequest): Long {
-        return transaction {
-            Stages.insertAndGetId { row ->
-                row[name] = request.name
-                row[level] = request.level
-            }
-        }.value
-    }
-
-    fun findAll(): List<StageResponse> {
+    fun findAll(): List<Stage> {
         return transaction {
             Stages.selectAll().orderBy(Stages.level).map { row ->
-                StageResponse(row[Stages.id].value, row[Stages.name], row[Stages.level])
+                Stage(row[Stages.id].value, row[Stages.name], row[Stages.level])
             }.toList()
         }
     }
