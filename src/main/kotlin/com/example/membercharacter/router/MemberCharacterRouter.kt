@@ -1,5 +1,8 @@
 package com.example.membercharacter.router
 
+import com.example.member.exception.MemberException
+import com.example.member.exception.MemberExceptionType
+import com.example.member.exception.MemberExceptionType.*
 import com.example.membercharacter.dto.MemberCharacterLevelUpRequest
 import com.example.membercharacter.service.MemberCharacterService
 import io.ktor.server.application.*
@@ -14,8 +17,8 @@ fun Routing.memberCharacterRoute(memberCharacterService: MemberCharacterService)
     route("api/v1") {
         authenticate {
             get("characters") {
-                val principal = call.principal<JWTPrincipal>()
-                val memberCharacters = memberCharacterService.getMemberCharacters(principal!!)
+                val principal = call.principal<JWTPrincipal>() ?: throw MemberException(UN_AUTHORIZED)
+                val memberCharacters = memberCharacterService.getMemberCharacters(principal)
                 call.respond(memberCharacters)
             }
             post("characters/{charactersId}") {

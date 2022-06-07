@@ -1,5 +1,8 @@
 package com.example.memberitem.router
 
+import com.example.member.exception.MemberException
+import com.example.member.exception.MemberExceptionType
+import com.example.member.exception.MemberExceptionType.*
 import com.example.memberitem.dto.MemberItemRequest
 import com.example.memberitem.service.MemberItemService
 import io.ktor.server.application.*
@@ -13,14 +16,14 @@ fun Routing.memberItemRoute(memberItemService: MemberItemService) {
     route("api/v1") {
         authenticate {
             get("items") {
-                val principal = call.principal<JWTPrincipal>()
-                val memberItems = memberItemService.getMemberItems(principal!!)
+                val principal = call.principal<JWTPrincipal>() ?: throw MemberException(UN_AUTHORIZED)
+                val memberItems = memberItemService.getMemberItems(principal)
                 call.respond(memberItems)
             }
             post("members/{memberId}/items") {
-                val principal = call.principal<JWTPrincipal>()
+                val principal = call.principal<JWTPrincipal>() ?: throw MemberException(UN_AUTHORIZED)
                 val memberItemRequests = call.receive<List<MemberItemRequest>>()
-                memberItemService.updateMemberItems(principal!!, memberItemRequests)
+                memberItemService.updateMemberItems(principal, memberItemRequests)
                 call.respond("success!!")
             }
         }

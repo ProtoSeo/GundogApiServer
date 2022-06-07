@@ -1,5 +1,8 @@
 package com.example.memberstage.router
 
+import com.example.member.exception.MemberException
+import com.example.member.exception.MemberExceptionType
+import com.example.member.exception.MemberExceptionType.*
 import com.example.memberstage.dto.MemberStageRequest
 import com.example.memberstage.service.MemberStageService
 import io.ktor.server.application.*
@@ -20,8 +23,8 @@ fun Routing.memberStageRoute(memberStageService: MemberStageService) {
             }
             put("stages/{stageId}/result") {
                 val memberStageRequest = call.receive<MemberStageRequest>()
-                val principal = call.principal<JWTPrincipal>()
-                val updateMsg = memberStageService.saveOrUpdateMemberStageResult(principal!!, memberStageRequest)
+                val principal = call.principal<JWTPrincipal>() ?: throw MemberException(UN_AUTHORIZED)
+                val updateMsg = memberStageService.saveOrUpdateMemberStageResult(principal, memberStageRequest)
                 call.respond(updateMsg)
             }
             get("stages/{stageId}/members/{memberId}") {
