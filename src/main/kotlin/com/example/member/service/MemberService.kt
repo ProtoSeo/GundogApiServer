@@ -3,7 +3,6 @@ package com.example.member.service
 import com.example.member.dto.MemberLoginResponse
 import com.example.member.dto.MemberRequest
 import com.example.member.exception.MemberException
-import com.example.member.exception.MemberExceptionType
 import com.example.member.exception.MemberExceptionType.*
 import com.example.member.repository.MemberRepository
 import com.example.membercharacter.repository.MemberCharacterRepository
@@ -34,7 +33,7 @@ class MemberService(
         if (member.password == String(base64Encoder.encode(request.password.toByteArray()))) {
             return MemberLoginResponse(member.email, JwtProvider.createJWT(member))
         }
-        throw MemberException(UN_AUTHORIZATION)
+        throw MemberException(BAD_REQUEST)
     }
 
     fun isDuplicateEmail(email: String): Boolean = memberRepository.existsMemberByEmail(email)
