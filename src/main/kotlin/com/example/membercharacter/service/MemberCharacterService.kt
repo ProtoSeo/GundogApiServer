@@ -1,6 +1,6 @@
 package com.example.membercharacter.service
 
-import com.example.membercharacter.dto.MemberCharacterLevelUpRequest
+import com.example.membercharacter.domain.LevelUpValue.*
 import com.example.membercharacter.dto.MemberCharacter
 import com.example.membercharacter.exception.MemberCharacterException
 import com.example.membercharacter.exception.MemberCharacterExceptionType.*
@@ -14,8 +14,16 @@ class MemberCharacterService(private val memberCharacterRepository: MemberCharac
         return memberCharacterRepository.findAllByMemberId(memberId)
     }
 
-    fun levelUpMemberCharacters(memberCharacterId: Long, request: MemberCharacterLevelUpRequest): MemberCharacter {
-        return memberCharacterRepository.update(memberCharacterId, request) ?: throw MemberCharacterException(NOT_FOUND)
+    fun levelUpStaminaLevel(principal: JWTPrincipal, memberCharacterId: Long): MemberCharacter {
+        val memberId = principal.payload.getClaim("id").asLong()
+        return memberCharacterRepository.update(memberId, memberCharacterId, STAMINA)
+            ?: throw MemberCharacterException(NOT_FOUND)
+    }
+
+    fun levelUpHealthLevel(principal: JWTPrincipal, memberCharacterId: Long): MemberCharacter {
+        val memberId = principal.payload.getClaim("id").asLong()
+        return memberCharacterRepository.update(memberId, memberCharacterId, HEALTH)
+            ?: throw MemberCharacterException(NOT_FOUND)
     }
 
     fun openMemberCharacters(memberCharacterId: Long): MemberCharacter {
