@@ -1,14 +1,11 @@
 package com.example.membercharacter.router
 
 import com.example.member.exception.MemberException
-import com.example.member.exception.MemberExceptionType
 import com.example.member.exception.MemberExceptionType.*
-import com.example.membercharacter.dto.MemberCharacterLevelUpRequest
 import com.example.membercharacter.service.MemberCharacterService
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
-import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.util.*
@@ -26,10 +23,16 @@ fun Routing.memberCharacterRoute(memberCharacterService: MemberCharacterService)
                 val memberCharacter = memberCharacterService.openMemberCharacters(charactersId)
                 call.respond(memberCharacter)
             }
-            post("characters/{charactersId}/level") {
+            post("characters/{charactersId}/health") {
+                val principal = call.principal<JWTPrincipal>() ?: throw MemberException(UN_AUTHORIZED)
                 val charactersId = call.parameters.getOrFail<Long>("charactersId")
-                val request = call.receive<MemberCharacterLevelUpRequest>()
-                val memberCharacter = memberCharacterService.levelUpMemberCharacters(charactersId, request)
+                val memberCharacter = memberCharacterService.levelUpHealthLevel(principal, charactersId)
+                call.respond(memberCharacter)
+            }
+            post("characters/{charactersId}/stamina") {
+                val principal = call.principal<JWTPrincipal>() ?: throw MemberException(UN_AUTHORIZED)
+                val charactersId = call.parameters.getOrFail<Long>("charactersId")
+                val memberCharacter = memberCharacterService.levelUpStaminaLevel(principal, charactersId)
                 call.respond(memberCharacter)
             }
         }
