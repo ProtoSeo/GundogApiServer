@@ -10,14 +10,10 @@ import io.ktor.server.auth.jwt.*
 
 class MemberStageService(private val memberStageRepository: MemberStageRepository) {
 
-    fun saveOrUpdateMemberStageResult(principal: JWTPrincipal, request: MemberStageRequest): String {
+    fun saveOrUpdateMemberStageResult(principal: JWTPrincipal, request: MemberStageRequest): MemberStageInfo {
         val memberId = principal.payload.getClaim("id").asLong()
-        val isUpdate = if (memberStageRepository.existsMemberStageByMemberIdAndStageId(memberId, request.stageId)) {
-            memberStageRepository.update(memberId, request)
-        } else {
-            memberStageRepository.save(memberId, request)
-        }
-        return if (isUpdate) "성공적으로 업데이트되었습니다." else "기존 점수가 높으므로 업데이트 되지 않습니다."
+        return memberStageRepository.saveOrUpdate(memberId, request)
+            ?: throw MemberStageException(MEMBER_STAGE_NOT_FOUND)
     }
 
     fun getRankingToStage(stageId: Long): List<StageRankInfo> {

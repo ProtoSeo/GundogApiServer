@@ -15,36 +15,28 @@ class MemberStageRepository {
         }
     }
 
-    fun save(memberId: Long, request: MemberStageRequest): Boolean {
-        transaction {
-            MemberStages.insert { row ->
-                row[this.memberId] = memberId
-                row[stageId] = request.stageId
-                row[isClear] = request.isClear
-                row[bestScore] = request.bestScore
-            }
-        }
-        return true
-    }
-
-    fun update(memberId: Long, request: MemberStageRequest): Boolean {
+    fun saveOrUpdate(memberId: Long, request: MemberStageRequest): MemberStageInfo? {
         return transaction {
-            val memberStage = MemberStages.select {
+            val memberStage = MemberStages.slice(MemberStages.isClear, MemberStages.bestScore).select {
                 MemberStages.memberId eq memberId and (MemberStages.stageId eq request.stageId)
             }.limit(1).firstOrNull()
 
-            val isClear = memberStage?.get(MemberStages.isClear) ?: false
-            val bestScore = memberStage?.get(MemberStages.bestScore) ?: 0L
-
-            if ((isClear == request.isClear && bestScore < request.bestScore) || (!isClear && request.isClear)) {
-                MemberStages.update({ MemberStages.memberId eq memberId and (MemberStages.stageId eq request.stageId) }) { row ->
-                    row[this.isClear] = request.isClear
-                    row[this.bestScore] = request.bestScore
+            if (memberStage == null) {
+                MemberStages.insert { row ->
+                    row[this.memberId] = memberId
+                    row[stageId] = request.stageId
+                    row[isClear] = request.isClear
+                    if (request.isClear) row[bestScore] = request.bestScore
                 }
-                true
             } else {
-                false
+                if (request.isClear && memberStage[MemberStages.bestScore] < request.bestScore) {
+                    MemberStages.update { row ->
+                        row[isClear] = true
+                        row[bestScore] = request.bestScore
+                    }
+                }
             }
+            findByMemberIdAndStageId(memberId, request.stageId)
         }
     }
 
@@ -76,13 +68,6 @@ class MemberStageRepository {
                 .map {
                     StageRankInfo(it[MemberStages.id].value, it[Members.email], it[MemberStages.bestScore])
                 }.toList()
-        }
-    }
-
-    fun existsMemberStageByMemberIdAndStageId(memberId: Long, stageId: Long): Boolean {
-        return transaction {
-            MemberStages.slice(MemberStages.id)
-                .select { MemberStages.memberId eq memberId and (MemberStages.stageId eq stageId) }.count() > 0
         }
     }
 }
