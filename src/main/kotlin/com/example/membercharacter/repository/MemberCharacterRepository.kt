@@ -1,11 +1,14 @@
 package com.example.membercharacter.repository
 
 import com.example.character.domain.Characters
-import com.example.membercharacter.domain.LevelLimit.*
+import com.example.membercharacter.domain.ItemLimit
+import com.example.membercharacter.domain.LevelUpValue
+import com.example.membercharacter.domain.LevelUpValue.*
 import com.example.membercharacter.domain.MemberCharacters
-import com.example.membercharacter.dto.MemberCharacterLevelUpRequest
 import com.example.membercharacter.dto.MemberCharacter
+import com.example.memberitem.domain.MemberItems
 import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class MemberCharacterRepository {
@@ -65,20 +68,44 @@ class MemberCharacterRepository {
         }
     }
 
-    fun update(memberCharacterId: Long, request: MemberCharacterLevelUpRequest): MemberCharacter? {
+    fun update(memberCharacterId: Long): MemberCharacter? {
         transaction {
             MemberCharacters.update({ MemberCharacters.id eq memberCharacterId }) { row ->
-                if (request.healthLevel <= HEALTH_LEVEL.limit) row[healthLevel] = request.healthLevel
-                if (request.staminaLevel <= STAMINA_LEVEL.limit) row[staminaLevel] = request.staminaLevel
+                row[isOpen] = true
             }
         }
         return findById(memberCharacterId)
     }
 
-    fun update(memberCharacterId: Long): MemberCharacter? {
+    fun update(memberId: Long, memberCharacterId: Long, wantedLevel: LevelUpValue): MemberCharacter? {
         transaction {
-            MemberCharacters.update({ MemberCharacters.id eq memberCharacterId }) { row ->
-                row[isOpen] = true
+            val wantedColumn =
+                if (wantedLevel == HEALTH) MemberCharacters.healthLevel else MemberCharacters.staminaLevel
+
+            val memberItem = MemberItems.slice(MemberItems.count)
+                .select(MemberItems.memberId eq memberId and (MemberItems.itemId eq 1L))
+                .limit(1)
+                .first()
+
+            val memberCharacter = MemberCharacters.slice(wantedColumn)
+                .select { MemberCharacters.id eq memberCharacterId }
+                .limit(1)
+                .first()
+
+            val memberCharacterValueLevel = memberCharacter[wantedColumn]
+            val numberOfNeedsDogGum =
+                if (wantedLevel == HEALTH) ItemLimit.numberOfDogGumForHealthLevelUp(memberCharacterValueLevel)
+                else ItemLimit.numberOfDogGumForStaminaLevelUp(memberCharacterValueLevel)
+
+            val numberOfUserHasDogGum = memberItem[MemberItems.count]
+
+            if (numberOfNeedsDogGum <= numberOfUserHasDogGum) {
+                MemberItems.update({ MemberItems.memberId eq memberId and (MemberItems.itemId eq 1L) }) { row ->
+                    row[count] = numberOfUserHasDogGum - numberOfNeedsDogGum
+                }
+                MemberCharacters.update({ MemberCharacters.id eq memberCharacterId }) { row ->
+                    row[healthLevel] = memberCharacterValueLevel + 1
+                }
             }
         }
         return findById(memberCharacterId)
