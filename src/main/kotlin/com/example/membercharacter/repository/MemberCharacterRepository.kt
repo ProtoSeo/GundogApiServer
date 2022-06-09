@@ -1,6 +1,6 @@
 package com.example.membercharacter.repository
 
-import com.example.character.domain.Characters
+import com.example.membercharacter.domain.Characters
 import com.example.membercharacter.domain.ItemLimit
 import com.example.membercharacter.domain.LevelUpValue
 import com.example.membercharacter.domain.LevelUpValue.*

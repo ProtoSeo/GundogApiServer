@@ -1,7 +1,6 @@
 package com.example.memberstage.domain
 
 import com.example.member.domain.Members
-import com.example.stage.domain.Stages
 import org.jetbrains.exposed.dao.id.LongIdTable
 
 object MemberStages : LongIdTable(name = "member_stage") {

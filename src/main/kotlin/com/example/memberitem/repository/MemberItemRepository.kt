@@ -1,11 +1,10 @@
 package com.example.memberitem.repository
 
-import com.example.item.domain.Items
+import com.example.memberitem.domain.Items
 import com.example.memberitem.domain.MemberItems
 import com.example.memberitem.dto.MemberItemRequest
 import com.example.memberitem.dto.MemberItemResponse
 import com.example.memberitem.exception.MemberItemException
-import com.example.memberitem.exception.MemberItemExceptionType
 import com.example.memberitem.exception.MemberItemExceptionType.*
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
