@@ -68,6 +68,7 @@ class MemberCharacterRepository {
         }
     }
 
+    //TODO 수정 필요
     fun update(memberCharacterId: Long): MemberCharacter? {
         transaction {
             MemberCharacters.update({ MemberCharacters.id eq memberCharacterId }) { row ->
@@ -104,7 +105,7 @@ class MemberCharacterRepository {
                     row[count] = numberOfUserHasDogGum - numberOfNeedsDogGum
                 }
                 MemberCharacters.update({ MemberCharacters.id eq memberCharacterId }) { row ->
-                    row[healthLevel] = memberCharacterValueLevel + 1
+                    row[wantedColumn] = memberCharacterValueLevel + 1
                 }
             }
         }
