@@ -14,7 +14,7 @@ import org.kodein.di.instance
 
 object ModuleConfig {
     private val memberModule = DI.Module("Member") {
-        bindSingleton { MemberService(instance(), instance(), instance()) }
+        bindSingleton { MemberService(instance(), instance(), instance(), instance()) }
         bindSingleton { MemberRepository() }
     }
 
