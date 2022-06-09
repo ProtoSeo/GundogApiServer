@@ -60,9 +60,10 @@ CREATE TABLE member_character
 
 CREATE TABLE stage
 (
-    id      BIGINT AUTO_INCREMENT PRIMARY KEY,
-    `name`  VARCHAR(100) NOT NULL,
-    `level` INT          NOT NULL
+    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `name`     VARCHAR(100)      NOT NULL,
+    `level`    INT               NOT NULL,
+    next_id BIGINT DEFAULT -1 NOT NULL
 );
 
 ALTER TABLE stage
@@ -77,6 +78,7 @@ CREATE TABLE member_stage
     member_id  BIGINT                NOT NULL,
     stage_id   BIGINT                NOT NULL,
     is_clear   BOOLEAN DEFAULT FALSE NOT NULL,
+    is_open    BOOLEAN DEFAULT FALSE NOT NULL,
     best_score BIGINT  DEFAULT 0     NOT NULL,
     CONSTRAINT fk_member_stage_member_id__id FOREIGN KEY (member_id) REFERENCES `member` (id) ON DELETE RESTRICT ON UPDATE RESTRICT,
     CONSTRAINT fk_member_stage_stage_id__id FOREIGN KEY (stage_id) REFERENCES stage (id) ON DELETE RESTRICT ON UPDATE RESTRICT
@@ -84,13 +86,13 @@ CREATE TABLE member_stage
 
 -- TODO 스테이지, 아이템, 캐릭터 확정되면 수정하기
 INSERT INTO stage
-VALUES (1, '첫 번째 스테이지', 1);
+VALUES (1, '첫 번째 스테이지', 1, 2);
 INSERT INTO stage
-VALUES (2, '두 번째 스테이지', 2);
+VALUES (2, '두 번째 스테이지', 2, 3);
 INSERT INTO stage
-VALUES (3, '세 번째 스테이지', 3);
+VALUES (3, '세 번째 스테이지', 3, 4);
 INSERT INTO stage
-VALUES (4, '네 번째 스테이지', 4);
+VALUES (4, '네 번째 스테이지', 4, DEFAULT);
 
 INSERT INTO item
 VALUES (1, '개껌', '강아지들이 가장 좋아하는 개껌이다. 보기만 해도 꼬리를 흔드는 것 같다.', DEFAULT);
@@ -109,7 +111,3 @@ INSERT INTO `characters`
 VALUES (2, '송이', DEFAULT, DEFAULT);
 INSERT INTO `characters`
 VALUES (3, '쭈니', DEFAULT, DEFAULT);
-
-select * from member_character;
-select * from member_stage;
-select * from member_item;
