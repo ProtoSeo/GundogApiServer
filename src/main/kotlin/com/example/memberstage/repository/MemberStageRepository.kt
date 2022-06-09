@@ -81,7 +81,6 @@ class MemberStageRepository {
     }
 
     fun findAllByMemberId(memberId: Long): List<StageInfo> {
-        saveMemberStages(memberId)
         return transaction {
             MemberStages.slice(
                 MemberStages.id,
