@@ -1,6 +1,6 @@
 package com.example.membercharacter.dto
 
-data class MemberCharacterResponse(
+data class MemberCharacter(
     val id: Long,
     val characterId: Long,
     val healthLevel: Int,

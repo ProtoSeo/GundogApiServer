@@ -1,6 +1,5 @@
 package com.example.memberitem.domain
 
-import com.example.item.domain.Items
 import com.example.member.domain.Members
 import org.jetbrains.exposed.dao.id.LongIdTable
 

@@ -1,12 +1,11 @@
-package com.example.member.exception
+package com.example.membercharacter.exception
 
 import com.example.common.exception.BaseException
 import com.example.common.exception.ExceptionType
 
-class MemberException(private val exceptionType: MemberExceptionType): BaseException() {
+class MemberCharacterException(private val exceptionType: ExceptionType) : BaseException() {
 
     override fun getExceptionType(): ExceptionType {
         return this.exceptionType
     }
-
 }

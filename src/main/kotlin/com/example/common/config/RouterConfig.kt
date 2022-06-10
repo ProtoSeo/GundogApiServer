@@ -8,15 +8,12 @@ import com.example.memberitem.router.memberItemRoute
 import com.example.memberitem.service.MemberItemService
 import com.example.memberstage.router.memberStageRoute
 import com.example.memberstage.service.MemberStageService
-import com.example.stage.router.stageRouter
-import com.example.stage.service.StageService
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
 import org.kodein.di.instance
 
 fun Application.configureRouting() {
     val memberService: MemberService by ModuleConfig.kodein.instance()
-    val stageService: StageService by ModuleConfig.kodein.instance()
     val memberStageService: MemberStageService by ModuleConfig.kodein.instance()
     val memberItemService: MemberItemService by ModuleConfig.kodein.instance()
     val memberCharacterService: MemberCharacterService by ModuleConfig.kodein.instance()
@@ -24,7 +21,6 @@ fun Application.configureRouting() {
     routing {
         memberRoute(memberService)
         memberStageRoute(memberStageService)
-        stageRouter(stageService)
         memberItemRoute(memberItemService)
         memberCharacterRoute(memberCharacterService)
     }

@@ -1,4 +1,4 @@
-package com.example.item.domain
+package com.example.memberitem.domain
 
 import org.jetbrains.exposed.dao.id.LongIdTable
 
