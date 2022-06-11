@@ -21,7 +21,8 @@ class MemberStageService(private val memberStageRepository: MemberStageRepositor
         return memberStageRepository.findRankingByStageId(stageId)
     }
 
-    fun getMemberStage(stageId: Long, memberId: Long): StageDetailDto {
+    fun getMemberStage(principal: JWTPrincipal, stageId: Long): StageDetailDto {
+        val memberId = principal.payload.getClaim("id").asLong()
         return memberStageRepository.findByMemberIdAndStageId(memberId, stageId)
             ?: throw MemberStageException(MEMBER_STAGE_NOT_FOUND)
     }
