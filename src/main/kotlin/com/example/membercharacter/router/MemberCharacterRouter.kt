@@ -19,8 +19,9 @@ fun Routing.memberCharacterRoute(memberCharacterService: MemberCharacterService)
                 call.respond(memberCharacters)
             }
             post("characters/{charactersId}") {
+                val principal = call.principal<JWTPrincipal>() ?: throw MemberException(UN_AUTHORIZED)
                 val charactersId = call.parameters.getOrFail<Long>("charactersId")
-                val memberCharacter = memberCharacterService.openMemberCharacters(charactersId)
+                val memberCharacter = memberCharacterService.unlockMemberCharacters(principal, charactersId)
                 call.respond(memberCharacter)
             }
             post("characters/{charactersId}/health") {
