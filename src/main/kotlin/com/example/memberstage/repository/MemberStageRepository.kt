@@ -3,9 +3,10 @@ package com.example.memberstage.repository
 import com.example.member.domain.Members
 import com.example.memberstage.domain.MemberStages
 import com.example.memberstage.domain.Stages
-import com.example.memberstage.dto.MemberStageRequest
-import com.example.memberstage.dto.StageRankInfo
-import com.example.memberstage.dto.StageInfo
+import com.example.memberstage.dto.StageClearRequestDto
+import com.example.memberstage.dto.StageDetailDto
+import com.example.memberstage.dto.StageRankDto
+import com.example.memberstage.dto.StageDto
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 
@@ -32,7 +33,7 @@ class MemberStageRepository {
         }
     }
 
-    fun update(memberId: Long, request: MemberStageRequest): StageInfo? {
+    fun update(memberId: Long, request: StageClearRequestDto): StageDetailDto? {
         transaction {
             val memberStage = MemberStages.innerJoin(Stages)
                 .slice(MemberStages.id, MemberStages.isClear, MemberStages.bestScore, Stages.nextId)
@@ -58,19 +59,19 @@ class MemberStageRepository {
         return findByMemberIdAndStageId(memberId, request.stageId)
     }
 
-    fun findByMemberIdAndStageId(memberId: Long, stageId: Long): StageInfo? {
+    fun findByMemberIdAndStageId(memberId: Long, stageId: Long): StageDetailDto? {
         return transaction {
-            MemberStages.slice(
-                MemberStages.id,
-                Members.email,
+            MemberStages.slice(MemberStages.id,
+                MemberStages.stageId,
                 MemberStages.bestScore,
                 MemberStages.isClear,
                 MemberStages.isOpen)
                 .select { MemberStages.memberId eq memberId and (MemberStages.stageId eq stageId) }
                 .limit(1)
                 .map {
-                    StageInfo(
+                    StageDetailDto(
                         it[MemberStages.id].value,
+                        it[MemberStages.stageId].value,
                         it[MemberStages.bestScore],
                         it[MemberStages.isClear],
                         it[MemberStages.isOpen]
@@ -80,19 +81,14 @@ class MemberStageRepository {
         }
     }
 
-    fun findAllByMemberId(memberId: Long): List<StageInfo> {
+    fun findAllByMemberId(memberId: Long): List<StageDto> {
         return transaction {
-            MemberStages.slice(
-                MemberStages.id,
-                Members.email,
-                MemberStages.bestScore,
-                MemberStages.isClear,
-                MemberStages.isOpen)
+            MemberStages.slice(MemberStages.id, MemberStages.stageId, MemberStages.isClear, MemberStages.isOpen)
                 .select { MemberStages.memberId eq memberId }
                 .map {
-                    StageInfo(
+                    StageDto(
                         it[MemberStages.id].value,
-                        it[MemberStages.bestScore],
+                        it[MemberStages.stageId].value,
                         it[MemberStages.isClear],
                         it[MemberStages.isOpen]
                     )
@@ -100,14 +96,14 @@ class MemberStageRepository {
         }
     }
 
-    fun findRankingByStageId(stageId: Long): List<StageRankInfo> {
+    fun findRankingByStageId(stageId: Long): List<StageRankDto> {
         return transaction {
             (MemberStages.join(Members, JoinType.INNER, additionalConstraint = { MemberStages.memberId eq Members.id }))
                 .slice(Members.email, MemberStages.bestScore)
                 .select { MemberStages.stageId eq stageId and (MemberStages.isClear eq true) }
                 .orderBy(MemberStages.bestScore, SortOrder.DESC)
                 .limit(5)
-                .mapIndexed { index, row -> StageRankInfo(index + 1, row[Members.email], row[MemberStages.bestScore]) }
+                .mapIndexed { index, row -> StageRankDto(index + 1, row[Members.email], row[MemberStages.bestScore]) }
                 .toList()
         }
     }

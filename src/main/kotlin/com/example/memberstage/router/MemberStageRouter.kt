@@ -2,7 +2,8 @@ package com.example.memberstage.router
 
 import com.example.member.exception.MemberException
 import com.example.member.exception.MemberExceptionType.*
-import com.example.memberstage.dto.MemberStageRequest
+import com.example.memberstage.dto.StageClearRequestDto
+import com.example.memberstage.dto.StageInfoDto
 import com.example.memberstage.service.MemberStageService
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -26,16 +27,23 @@ fun Routing.memberStageRoute(memberStageService: MemberStageService) {
                 call.respond(ranking)
             }
             put("stages/{stageId}/result") {
-                val memberStageRequest = call.receive<MemberStageRequest>()
+                val memberStageRequest = call.receive<StageClearRequestDto>()
                 val principal = call.principal<JWTPrincipal>() ?: throw MemberException(UN_AUTHORIZED)
-                val updateMsg = memberStageService.updateMemberStageResult(principal, memberStageRequest)
-                call.respond(updateMsg)
-            }
-            get("stages/{stageId}/members/{memberId}") {
-                val stageId = call.parameters.getOrFail<Long>("stageId")
-                val memberId = call.parameters.getOrFail<Long>("memberId")
-                val memberStage = memberStageService.getMemberStage(stageId, memberId)
+                val memberStage = memberStageService.updateMemberStageResult(principal, memberStageRequest)
                 call.respond(memberStage)
+            }
+            get("stages/{stageId}") {
+                val principal = call.principal<JWTPrincipal>() ?: throw MemberException(UN_AUTHORIZED)
+                val stageId = call.parameters.getOrFail<Long>("stageId")
+                val memberStage = memberStageService.getMemberStage(principal, stageId)
+                call.respond(memberStage)
+            }
+            get("stages/{stageId}/info") {
+                val principal = call.principal<JWTPrincipal>() ?: throw MemberException(UN_AUTHORIZED)
+                val stageId = call.parameters.getOrFail<Long>("stageId")
+                val memberStage = memberStageService.getMemberStage(principal, stageId)
+                val ranking = memberStageService.getRankingToStage(stageId)
+                call.respond(StageInfoDto(ranking, memberStage))
             }
         }
     }
