@@ -6,6 +6,9 @@ import com.example.membercharacter.domain.LevelUpValue
 import com.example.membercharacter.domain.LevelUpValue.*
 import com.example.membercharacter.domain.MemberCharacters
 import com.example.membercharacter.dto.MemberCharacter
+import com.example.membercharacter.exception.MemberCharacterException
+import com.example.membercharacter.exception.MemberCharacterExceptionType
+import com.example.membercharacter.exception.MemberCharacterExceptionType.*
 import com.example.memberitem.domain.MemberItems
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -68,14 +71,39 @@ class MemberCharacterRepository {
         }
     }
 
-    //TODO 수정 필요
-    fun update(memberCharacterId: Long): MemberCharacter? {
+    fun update(memberId: Long, memberCharacterId: Long): MemberCharacter? {
         transaction {
-            MemberCharacters.update({ MemberCharacters.id eq memberCharacterId }) { row ->
-                row[isOpen] = true
+            val memberCharacter = MemberCharacters.slice(MemberCharacters.characterId, MemberCharacters.isOpen)
+                .select { MemberCharacters.id eq memberCharacterId }
+                .limit(1)
+                .first()
+
+            if (memberCharacter[MemberCharacters.isOpen]) throw MemberCharacterException(DUPLICATE_UNLOCK)
+
+            if (isHaveItemForUnlock(memberCharacter[MemberCharacters.characterId].value, memberId)) {
+                MemberCharacters.update({ MemberCharacters.id eq memberCharacterId }) { row ->
+                    row[isOpen] = true
+                }
+            } else {
+                throw MemberCharacterException(INSUFFICIENT_ITEM)
             }
         }
         return findById(memberCharacterId)
+    }
+
+    private fun isHaveItemForUnlock(characterId: Long, memberId: Long): Boolean {
+        val unlockNeedItemIdAndCount = ItemLimit.numberOfItemForUnlockCharacter(characterId)
+        unlockNeedItemIdAndCount.map {
+            MemberItems.slice(MemberItems.id, MemberItems.count)
+                .select(MemberItems.memberId eq memberId and (MemberItems.itemId eq it.id))
+                .limit(1)
+                .first()
+        }.forEachIndexed { index, row ->
+            if (row[MemberItems.count] < unlockNeedItemIdAndCount[index].count) {
+                return false
+            }
+        }
+        return true
     }
 
     fun update(memberId: Long, memberCharacterId: Long, wantedLevel: LevelUpValue): MemberCharacter? {
@@ -93,6 +121,8 @@ class MemberCharacterRepository {
                 .limit(1)
                 .first()
 
+            if (!memberCharacter[MemberCharacters.isOpen]) throw MemberCharacterException(BAD_REQUEST)
+
             val memberCharacterValueLevel = memberCharacter[wantedColumn]
             val numberOfNeedsDogGum =
                 if (wantedLevel == HEALTH) ItemLimit.numberOfDogGumForHealthLevelUp(memberCharacterValueLevel)
@@ -107,6 +137,8 @@ class MemberCharacterRepository {
                 MemberCharacters.update({ MemberCharacters.id eq memberCharacterId }) { row ->
                     row[wantedColumn] = memberCharacterValueLevel + 1
                 }
+            } else {
+                throw throw MemberCharacterException(INSUFFICIENT_ITEM)
             }
         }
         return findById(memberCharacterId)
