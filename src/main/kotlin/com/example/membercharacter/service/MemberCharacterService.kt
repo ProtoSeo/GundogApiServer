@@ -26,7 +26,9 @@ class MemberCharacterService(private val memberCharacterRepository: MemberCharac
             ?: throw MemberCharacterException(NOT_FOUND)
     }
 
-    fun openMemberCharacters(memberCharacterId: Long): MemberCharacter {
-        return memberCharacterRepository.update(memberCharacterId) ?: throw MemberCharacterException(NOT_FOUND)
+    fun unlockMemberCharacters(principal: JWTPrincipal, memberCharacterId: Long): MemberCharacter {
+        val memberId = principal.payload.getClaim("id").asLong()
+        return memberCharacterRepository.update(memberId, memberCharacterId)
+            ?: throw MemberCharacterException(NOT_FOUND)
     }
 }
