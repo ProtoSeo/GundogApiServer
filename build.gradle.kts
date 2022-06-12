@@ -3,6 +3,7 @@ val kotlin_version: String by project
 val logback_version: String by project
 val exposedVersion: String by project
 val kodeinVersion: String by project
+val jbcryptVersion: String by project
 
 plugins {
     application
@@ -40,6 +41,7 @@ dependencies {
     implementation("com.zaxxer:HikariCP:3.4.2")
     implementation("io.ktor:ktor-server-status-pages:$ktor_version")
     implementation("org.kodein.di:kodein-di:$kodeinVersion")
+    implementation("org.mindrot:jbcrypt:$jbcryptVersion")
     testImplementation("io.ktor:ktor-server-tests-jvm:$ktor_version")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
 }
