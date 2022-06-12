@@ -9,7 +9,7 @@ import com.example.membercharacter.repository.MemberCharacterRepository
 import com.example.memberitem.repository.MemberItemRepository
 import com.example.memberstage.repository.MemberStageRepository
 import com.example.utils.JwtProvider
-import java.util.*
+import org.mindrot.jbcrypt.BCrypt
 
 class MemberService(
     private val memberRepository: MemberRepository,
@@ -17,14 +17,12 @@ class MemberService(
     private val memberStageRepository: MemberStageRepository,
     private val memberCharacterRepository: MemberCharacterRepository,
 ) {
-    private val base64Encoder = Base64.getEncoder()
 
     fun register(request: MemberRequest): Long {
         if (isDuplicateEmail(request.email)) {
             throw MemberException(DUPLICATE_EMAIL)
         }
-        val memberId =
-            memberRepository.save(request.copy(password = String(base64Encoder.encode(request.password.toByteArray()))))
+        val memberId = memberRepository.save(request.copy(password = BCrypt.hashpw(request.password, BCrypt.gensalt())))
         memberItemRepository.saveMemberItems(memberId)
         memberCharacterRepository.saveMemberCharacters(memberId)
         memberStageRepository.saveMemberStages(memberId)
@@ -33,7 +31,7 @@ class MemberService(
 
     fun login(request: MemberRequest): MemberLoginResponse {
         val member = memberRepository.findByEmail(request.email) ?: throw MemberException(NOT_FOUND)
-        if (member.password == String(base64Encoder.encode(request.password.toByteArray()))) {
+        if (BCrypt.checkpw(request.password, member.password)) {
             return MemberLoginResponse(member.email, JwtProvider.createJWT(member))
         }
         throw MemberException(BAD_REQUEST)
