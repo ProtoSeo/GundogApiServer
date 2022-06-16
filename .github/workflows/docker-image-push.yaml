@@ -9,7 +9,7 @@ on:
       - 'feature/deploy'
 
 jobs:
-  docker:
+  image-build:
     runs-on: ubuntu-latest
     steps:
       -
@@ -34,3 +34,16 @@ jobs:
           context: .
           push: true
           tags: protoseo/gundog-api:v0.0.1
+  deploy-aws:
+    needs: image-build
+    runs-on: ubuntu-latest
+    steps:
+      - 
+        name: Run Deploy script
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          port: ${{ secrets.PORT }}
+          script: "~/deploy/deploy.sh"
