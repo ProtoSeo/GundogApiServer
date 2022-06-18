@@ -4,6 +4,7 @@ val logback_version: String by project
 val exposedVersion: String by project
 val kodeinVersion: String by project
 val jbcryptVersion: String by project
+val flywayVersion: String by project
 
 plugins {
     application
@@ -43,6 +44,7 @@ dependencies {
     implementation("io.ktor:ktor-server-status-pages:$ktor_version")
     implementation("org.kodein.di:kodein-di:$kodeinVersion")
     implementation("org.mindrot:jbcrypt:$jbcryptVersion")
+    implementation("org.flywaydb:flyway-core:$flywayVersion")
     testImplementation("io.ktor:ktor-server-tests-jvm:$ktor_version")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
 }
