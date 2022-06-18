@@ -22,6 +22,6 @@ fun Application.configureDB() {
 }
 
 fun databaseMigration(dataSource: DataSource) {
-    val flyway = Flyway.configure().dataSource(dataSource).baselineOnMigrate(false).load()
+    val flyway = Flyway.configure().dataSource(dataSource).load()
     flyway.migrate()
 }
