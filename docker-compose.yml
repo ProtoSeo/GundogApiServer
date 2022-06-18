@@ -15,16 +15,16 @@ services:
     networks:
       - gundog-network
   db:
-    image: mysql:5.7
-    container_name: mysql
+    image: mariadb:10.5
+    container_name: mariadb
     restart: always
     ports:
       - 3306:3306
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: gundog
-      MYSQL_USER: user
-      MYSQL_PASSWORD: mypass
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: gundog
+      MARIADB_USER: user
+      MARIADB_PASSWORD: mypass
       TZ: Asia/Seoul
     volumes:
       - ./db/mysql/data:/var/lib/mysql
