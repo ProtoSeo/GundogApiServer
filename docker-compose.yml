@@ -1,15 +1,15 @@
 services:
   web:
-    build: .
+    image: protoseo/gundog-api:v0.0.1
     container_name: gundog-api
     restart: always
     ports:
       - 8080:8080
     environment:
-      DRIVER: com.mysql.cj.jdbc.Driver
-      URL: jdbc:mysql://db:3306/gundog?rewriteBatchedStatements=true
-      USER: user
-      PASSWORD: mypass
+      DB_DRIVER: com.mysql.cj.jdbc.Driver
+      DB_URL: jdbc:mysql://db:3306/gundog?rewriteBatchedStatements=true
+      DB_USER: user
+      DB_PASSWORD: mypass
     depends_on:
       - db
     networks:
