@@ -11,12 +11,6 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class MemberStageRepository {
-    init {
-        transaction {
-            SchemaUtils.create(MemberStages)
-            SchemaUtils.create(Stages)
-        }
-    }
 
     fun saveMemberStages(memberId: Long) {
         transaction {
