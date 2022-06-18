@@ -15,12 +15,6 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class MemberCharacterRepository {
-    init {
-        transaction {
-            SchemaUtils.create(Characters)
-            SchemaUtils.create(MemberCharacters)
-        }
-    }
 
     fun saveMemberCharacters(memberId: Long) {
         transaction {

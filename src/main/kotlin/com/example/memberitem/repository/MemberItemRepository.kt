@@ -11,12 +11,6 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class MemberItemRepository {
-    init {
-        transaction {
-            SchemaUtils.create(Items)
-            SchemaUtils.create(MemberItems)
-        }
-    }
 
     fun saveMemberItems(memberId: Long) {
         transaction {

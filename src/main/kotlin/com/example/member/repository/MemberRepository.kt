@@ -8,11 +8,6 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class MemberRepository {
-    init {
-        transaction {
-            SchemaUtils.create(Members)
-        }
-    }
 
     fun existsMemberByEmail(email: String): Boolean {
         return transaction {
