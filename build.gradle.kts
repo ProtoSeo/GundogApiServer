@@ -45,6 +45,7 @@ dependencies {
     implementation("org.kodein.di:kodein-di:$kodeinVersion")
     implementation("org.mindrot:jbcrypt:$jbcryptVersion")
     implementation("org.flywaydb:flyway-core:$flywayVersion")
+    implementation("org.flywaydb:flyway-mysql:$flywayVersion")
     testImplementation("io.ktor:ktor-server-tests-jvm:$ktor_version")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
 }
