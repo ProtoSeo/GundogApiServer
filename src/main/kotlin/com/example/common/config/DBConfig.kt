@@ -3,7 +3,9 @@ package com.example.common.config
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.ktor.server.application.*
+import org.flywaydb.core.Flyway
 import org.jetbrains.exposed.sql.Database
+import javax.sql.DataSource
 
 fun Application.configureDB() {
     val databaseObject = environment.config.config("ktor.database")
@@ -15,5 +17,11 @@ fun Application.configureDB() {
         maximumPoolSize = 10
     }
     val dataSource = HikariDataSource(config)
+    databaseMigration(dataSource)
     Database.connect(dataSource)
+}
+
+fun databaseMigration(dataSource: DataSource) {
+    val flyway = Flyway.configure().dataSource(dataSource).baselineOnMigrate(false).load()
+    flyway.migrate()
 }
