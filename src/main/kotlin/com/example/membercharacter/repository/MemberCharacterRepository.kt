@@ -124,6 +124,10 @@ class MemberCharacterRepository {
 
             val numberOfUserHasDogGum = memberItem[MemberItems.count]
 
+            if(numberOfNeedsDogGum == -1L) {
+                throw MemberCharacterException(OVER_LEVEL_UP)
+            }
+
             if (numberOfNeedsDogGum <= numberOfUserHasDogGum) {
                 MemberItems.update({ MemberItems.memberId eq memberId and (MemberItems.itemId eq 1L) }) { row ->
                     row[count] = numberOfUserHasDogGum - numberOfNeedsDogGum
@@ -132,7 +136,7 @@ class MemberCharacterRepository {
                     row[wantedColumn] = memberCharacterValueLevel + 1
                 }
             } else {
-                throw throw MemberCharacterException(INSUFFICIENT_ITEM)
+                throw MemberCharacterException(INSUFFICIENT_ITEM)
             }
         }
         return findById(memberCharacterId)
