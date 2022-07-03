@@ -110,7 +110,7 @@ class MemberCharacterRepository {
                 .limit(1)
                 .first()
 
-            val memberCharacter = MemberCharacters.slice(wantedColumn)
+            val memberCharacter = MemberCharacters.slice(wantedColumn, MemberCharacters.isOpen)
                 .select { MemberCharacters.id eq memberCharacterId }
                 .limit(1)
                 .first()
