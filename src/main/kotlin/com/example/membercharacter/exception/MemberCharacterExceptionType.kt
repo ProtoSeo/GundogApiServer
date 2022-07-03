@@ -8,6 +8,7 @@ enum class MemberCharacterExceptionType(private val httpStatusCode: HttpStatusCo
     NOT_FOUND(HttpStatusCode.NotFound, "해당 캐릭터에 대한 정보를 찾을 수 없습니다."),
     DUPLICATE_UNLOCK(HttpStatusCode.Conflict, "해당 캐릭터는 이미 잠금해제 되었습니다."),
     INSUFFICIENT_ITEM(HttpStatusCode.BadRequest, "아이템 개수가 부족합니다."),
+    OVER_LEVEL_UP(HttpStatusCode.BadRequest, "더이상 레벨업을 할 수 없습니다."),
     BAD_REQUEST(HttpStatusCode.BadRequest, "잘못된 요청입니다.");
 
     override fun getHttpStatus(): HttpStatusCode {
